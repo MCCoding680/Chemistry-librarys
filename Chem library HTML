@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="chemlibrary.CSS">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Search Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        h3 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Welcome to the Element Search Program!</h1>
+<p>Type the element name or symbol to search.</p>
+<p>Just writing the symbol in caps like H will normally show more results</p>
+
+<input type="text" id="searchTerm" placeholder="Enter element name or symbol..." />
+<button onclick="searchElement()">Search</button>
+
+<div id="results"></div>
+
+<script>
+    const knownElements = {
+        "H": ["H2O (Water)", "HCl (Hydrochloric Acid)", "H2SO4 (Sulfuric Acid)", "C2H5OH (Ethanol)"],
+        "He": ["He (Helium - noble gas)"],
+        "Li": ["Li2O (Lithium Oxide)", "LiCl (Lithium Chloride)", "LiOH (Lithium Hydroxide)"],
+        "Be": ["BeO (Beryllium Oxide)", "BeCl2 (Beryllium Chloride)"],
+        "B": ["B2O3 (Boron Oxide)", "BF3 (Boron Trifluoride)"],
+        "C": ["CO2 (Carbon Dioxide)", "CH4 (Methane)", "C2H5OH (Ethanol)", "C6H12O6 (Glucose)"],
+        "N": ["NH3 (Ammonia)", "N2 (Nitrogen Gas)", "HNO3 (Nitric Acid)"],
+        "O": ["O2 (Oxygen Gas)", "O3 (Ozone)", "H2O2 (Hydrogen Peroxide)", "H2O (Water)"],
+        "F": ["NaF (Sodium Fluoride)", "HF (Hydrofluoric Acid)"],
+        "Ne": ["Ne (Neon - noble gas)"],
+        "Na": ["NaCl (Sodium Chloride)", "NaOH (Sodium Hydroxide)", "Na2SO4 (Sodium Sulfate)"],
+        "Mg": ["MgO (Magnesium Oxide)", "MgCl2 (Magnesium Chloride)"],
+        "Al": ["Al2O3 (Aluminum Oxide)", "AlCl3 (Aluminum Chloride)"],
+        "Si": ["SiO2 (Silicon Dioxide)", "SiCl4 (Silicon Tetrachloride)"],
+        "P": ["P2O5 (Phosphorus Pentoxide)", "H3PO4 (Phosphoric Acid)"],
+        "S": ["SO2 (Sulfur Dioxide)", "H2SO4 (Sulfuric Acid)"],
+        "Cl": ["HCl (Hydrochloric Acid)", "NaCl (Sodium Chloride)"],
+        "Ar": ["Ar (Argon - noble gas)"],
+        "K": ["KCl (Potassium Chloride)", "K2SO4 (Potassium Sulfate)"],
+        "Ca": ["CaO (Calcium Oxide)", "CaCO3 (Calcium Carbonate)"],
+        "Sc": ["Sc2O3 (Scandium Oxide)"],
+        "Ti": ["TiO2 (Titanium Dioxide)", "TiCl4 (Titanium Tetrachloride)"],
+        "V": ["V2O5 (Vanadium Pentoxide)"],
+        "Cr": ["CrO3 (Chromium Trioxide)", "K2Cr2O7 (Potassium Dichromate)"],
+        "Mn": ["MnO2 (Manganese Dioxide)", "KMnO4 (Potassium Permanganate)"],
+        "Fe": ["Fe2O3 (Iron(III) Oxide)", "FeCl3 (Iron(III) Chloride)", "FeSO4 (Iron(II) Sulfate)"],
+        "Co": ["CoCl2 (Cobalt(II) Chloride)"],
+        "Ni": ["NiO (Nickel(II) Oxide)", "NiCl2 (Nickel(II) Chloride)"],
+        "Cu": ["CuSO4 (Copper(II) Sulfate)", "CuCl2 (Copper(II) Chloride)"],
+        "Zn": ["ZnO (Zinc Oxide)", "ZnCl2 (Zinc Chloride)"],
+        "Ga": ["Ga2O3 (Gallium Oxide)"],
+        "Ge": ["GeO2 (Germanium Dioxide)"],
+        "As": ["As2O3 (Arsenic Trioxide)"],
+        "Se": ["H2Se (Hydrogen Selenide)", "SeO2 (Selenium Dioxide)"],
+        "Br": ["Br2 (Bromine)", "HBr (Hydrobromic Acid)"],
+        "Kr": ["Kr (Krypton - noble gas)"],
+        "Rb": ["RbCl (Rubidium Chloride)"],
+        "Sr": ["SrO (Strontium Oxide)", "SrSO4 (Strontium Sulfate)"],
+        "Y": ["Y2O3 (Yttrium Oxide)"],
+        "Zr": ["ZrO2 (Zirconium Dioxide)"],
+        "Nb": ["Nb2O5 (Niobium Pentoxide)"],
+        "Mo": ["MoO3 (Molybdenum Trioxide)"],
+        "Tc": ["TcO2 (Technetium Dioxide)"],
+        "Ru": ["RuO2 (Ruthenium Dioxide)"],
+        "Rh": ["RhCl3 (Rhodium(III) Chloride)"],
+        "Pd": ["PdCl2 (Palladium(II) Chloride)"],
+        "Ag": ["AgNO3 (Silver Nitrate)", "AgCl (Silver Chloride)"],
+        "Cd": ["CdO (Cadmium Oxide)", "CdCl2 (Cadmium Chloride)"],
+        "In": ["In2O3 (Indium Oxide)"],
+        "Sn": ["SnO2 (Tin Dioxide)"],
+        "Sb": ["Sb2O3 (Antimony Trioxide)"],
+        "Te": ["TeO2 (Tellurium Dioxide)"],
+        "I": ["HI (Hydriodic Acid)", "I2 (Iodine)"],
+        "Xe": ["Xe (Xenon - noble gas)"],
+        "Cs": ["CsCl (Cesium Chloride)"],
+        "Ba": ["BaO (Barium Oxide)", "BaSO4 (Barium Sulfate)"],
+        "La": ["La2O3 (Lanthanum Oxide)"],
+        "Ce": ["CeO2 (Cerium Dioxide)"],
+        "Pr": ["Pr6O11 (Praseodymium Oxide)"],
+        "Nd": ["Nd2O3 (Neodymium Oxide)"],
+        "Pm": ["PmO2 (Promethium Dioxide)"],
+        "Sm": ["Sm2O3 (Samarium Oxide)"],
+        "Eu": ["Eu2O3 (Europium Oxide)"],
+        "Gd": ["Gd2O3 (Gadolinium Oxide)"],
+        "Tb": ["Tb4O7 (Terbium Oxide)"],
+        "Dy": ["Dy2O3 (Dysprosium Oxide)"],
+        "Ho": ["Ho2O3 (Holmium Oxide)"],
+        "Er": ["Er2O3 (Erbium Oxide)"],
+        "Tm": ["Tm2O3 (Thulium Oxide)"],
+        "Yb": ["Yb2O3 (Ytterbium Oxide)"],
+        "Lu": ["Lu2O3 (Lutetium Oxide)"],
+        "Hf": ["HfO2 (Hafnium Dioxide)"],
+        "Ta": ["Ta2O5 (Tantalum Pentoxide)"],
+        "W": ["WO3 (Tungsten Trioxide)"],
+        "Re": ["ReO3 (Rhenium Trioxide)"],
+        "Os": ["OsO4 (Osmium Tetroxide)"],
+        "Ir": ["IrCl3 (Iridium(III) Chloride)"],
+        "Pt": ["PtCl2 (Platinum(II) Chloride)"],
+        "Au": ["AuCl3 (Gold(III) Chloride)"],
+        "Hg": ["HgO (Mercury(II) Oxide)", "HgCl2 (Mercury(II) Chloride)"],
+        "Tl": ["Tl2O3 (Thallium(III) Oxide)"],
+        "Pb": ["PbO (Lead(II) Oxide)", "PbS (Lead Sulfide)"],
+        "Bi": ["Bi2O3 (Bismuth(III) Oxide)"],
+        "Po": ["Po2 (Polonium Dioxide)"],
+        "At": ["HAt (Hydrogen Astatide)"],
+        "Rn": ["Rn (Radon - noble gas)"],
+        "Fr": ["FrCl (Francium Chloride)"],
+        "Ra": ["RaO (Radium Oxide)"],
+        "Ac": ["AcCl3 (Actinium(III) Chloride)", "Ac(NO3)3 (Actinium(III) Nitrate)", "Ac2O3 (Actinium(III) Oxide)"],
+        "Th": ["ThO2 (Thorium Dioxide)", "ThCl4 (Thorium(IV) Chloride)"],
+        "Pa": ["PaO2 (Protactinium Dioxide)"],
+        "U": ["UO2 (Uranium Dioxide)", "UF6 (Uranium Hexafluoride)"],
+        "Np": ["NpO2 (Neptunium Dioxide)"],
+        "Pu": ["PuO2 (Plutonium Dioxide)", "PuCl4 (Plutonium(IV) Chloride)"],
+        "Am": ["AmO2 (Americium Dioxide)"],
+        "Cm": ["CmO2 (Curium Dioxide)"],
+        "Bk": ["BkO2 (Berkelium Dioxide)"],
+        "Cf": ["CfO2 (Californium Dioxide)"],
+        "Es": ["EsO3 (Einsteinium Trioxide)"],
+        "Fm": ["FmO2 (Fermium Dioxide)"],
+        "Md": ["MdO2 (Mendelevium Dioxide)"],
+        "No": ["NoO2 (Nobelium Dioxide)"],
+        "Lr": ["Lr2O3 (Lawrencium Oxide)"],
+        "Rf": ["RfO2 (Rutherfordium Dioxide)"],
+        "Db": ["DbO2 (Dubnium Dioxide)"],
+        "Sg": ["SgO2 (Seaborgium Dioxide)"],
+        "Bh": ["BhO2 (Bohrium Dioxide)"],
+        "Hs": ["HsO2 (Hassium Dioxide)"],
+        "Mt": ["MtO2 (Meitnerium Dioxide)"],
+        "Ds": ["DsO2 (Darmstadtium Dioxide)"],
+        "Rg": ["RgO2 (Roentgenium Dioxide)"],
+        "Cn": ["CnO2 (Copernicium Dioxide)"],
+        "Nh": ["NhO2 (Nihonium Dioxide)"],
+        "Fl": ["FlO2 (Flerovium Dioxide)"],
+        "Mc": ["McO2 (Moscovium Dioxide)"],
+        "Lv": ["LvO2 (Livermorium Dioxide)"],
+        "Ts": ["TsO2 (Tennessine Dioxide)"],
+        "Og": ["Og (Oganesson - noble gas)"]
+    };
+
+    function searchElement() {
+        const searchTerm = document.getElementById('searchTerm').value.trim().toLowerCase();
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = ''; // Clear previous results
+
+        if (searchTerm === 'q') {
+            resultsDiv.innerHTML = '<p>Exiting the search. Thank you for using the program!</p>';
+            return;
+        }
+
+        let results = [];
+
+        // Check if the search term matches any symbol (case insensitive)
+        for (const symbol in knownElements) {
+            if (searchTerm === symbol.toLowerCase()) {
+                results.push(`<strong>${symbol}</strong>: ${knownElements[symbol].join(', ')}`);
+            }
+        }
+
+        // Check if the search term is part of the names (case insensitive)
+        let found = false;
+        for (const symbol in knownElements) {
+            for (const compound of knownElements[symbol]) {
+                if (compound.toLowerCase().includes(searchTerm)) {
+                    results.push(`<strong>${symbol}</strong>: ${compound}`);
+                    found = true;
+                }
+            }
+        }
+
+        if (!results.length) {
+            results.push("Element not found. Please check the spelling.");
+        }
+
+        // Print the results in HTML format
+        resultsDiv.innerHTML = '<h3>Search Results:</h3><ul>' + results.map(result => `<li>${result}</li>`).join('') + '</ul>';
+    }
+</script>
+
+</body>
+</html>
